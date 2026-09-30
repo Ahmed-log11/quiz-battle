@@ -216,3 +216,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Node / React
+node_modules/
+dist/
+
+# Built frontend copied into the backend
+backend/static/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
