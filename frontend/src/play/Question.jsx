@@ -12,9 +12,10 @@ import { OPTION_LETTERS } from '../components/options.js'
  * Props:
  *   question   { index, total, text, options, timeLimit, deadline }
  *   onAnswer   called with the chosen option index (0-3)
+ *   initialChoice  answer already sent for this question (e.g. after a refresh), or null
  */
-export default function Question({ question, onAnswer }) {
-  const [selected, setSelected] = useState(null)
+export default function Question({ question, onAnswer, initialChoice = null }) {
+  const [selected, setSelected] = useState(initialChoice)
   const locked = selected !== null
 
   function choose(i) {

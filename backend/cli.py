@@ -9,14 +9,14 @@ Run:  python cli.py
 
 import time
 
-from game_logic import (POINT, add_player, advance, current_question,
+from game_logic import (POINT, TIME_LIMIT, add_player, advance, current_question,
                         leaderboard, new_game, start_game, submit_answer)
 from questions import QUESTIONS
 
 
 def ask_player(name, q):
     """Show the options, time the player, return (choice_index, seconds)."""
-    input(f"\n{name}, press Enter when you are ready...")
+    input(f"\n{name}, press Enter when you are ready ({TIME_LIMIT} seconds to answer)...")
     print(q["q"])
     for i, option in enumerate(q["options"], start=1):
         print(f"  {i}. {option}")
@@ -26,6 +26,8 @@ def ask_player(name, q):
     elapsed = time.time() - start
 
     choice = int(raw) - 1 if raw.isdigit() else -1   # -1 = invalid answer
+    if elapsed > TIME_LIMIT:
+        input(f"Too slow ({elapsed:.1f}s), your answer doesn't count. Press Enter...")
     print("\n" * 40)                          # hide the screen from the next player
     return choice, elapsed
 
@@ -44,24 +46,17 @@ def main():
         q = current_question(game)
         print(f"\n===== Question {game['q_index'] + 1}/{len(QUESTIONS)} =====")
 
-        results = []                          # list of (name, choice, seconds)
         for name in game["players"]:
             choice, elapsed = ask_player(name, q)
-            results.append((name, choice, elapsed))
+            submit_answer(game, name, choice, elapsed)
 
-        # Fastest first, so the fastest correct player gets the point (lambda)
-        results.sort(key=lambda r: r[2])
-        for name, choice, elapsed in results:
-            submit_answer(game, name, choice)
-
+        advance(game)                     # question -> reveal: fastest correct gets the point
         print(f"Correct answer: {q['options'][q['answer']]}")
         if game["winner"]:
-            print(f"Point goes to: {game['winner']} (+{POINT})")
+            print(f"Point goes to: {game['winner']} ({game['winner_seconds']:.1f}s, +{POINT})")
         else:
             print("Nobody got it right, no points!")
 
-        if game["phase"] == "question":   # nobody was correct, so move to reveal
-            advance(game)
         advance(game)                     # reveal -> next question (or finished)
 
     print("\n===== Final Scores =====")

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import Welcome from './Welcome.jsx'
-import HostLobby from './host/HostLobby.jsx'
+import HostFlow from './host/HostFlow.jsx'
+import PlayerFlow from './play/PlayerFlow.jsx'
 import Preview from './Preview.jsx'
 
 // Returns the current route: '/', '/host', '/play', or '/preview'
@@ -27,25 +27,11 @@ export default function App() {
     return <Preview />
   }
 
+  // Projector screen for the instructor
   if (route === '/host') {
-    return (
-      <HostLobby
-        code="KQZT"
-        players={[
-          { name: 'Sara', connected: true },
-          { name: 'Abdullah', connected: true },
-          { name: 'Noura', connected: false },
-        ]}
-        onStart={() => console.log('start')}
-      />
-    )
+    return <HostFlow />
   }
 
-  // '/' and '/play' both show the welcome screen for now
-  return (
-    <Welcome
-      onJoin={({ code, name }) => console.log('join', code, name)}
-      onHost={() => (location.hash = '#/host')}
-    />
-  )
+  // '/' and '/play' are the student screens
+  return <PlayerFlow onHost={() => (location.hash = '#/host')} />
 }
