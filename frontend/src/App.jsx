@@ -1,34 +1,51 @@
 import { useEffect, useState } from 'react'
+import Welcome from './Welcome.jsx'
+import HostLobby from './host/HostLobby.jsx'
+import Preview from './Preview.jsx'
 
-// Connect to the same site the page came from, so this works locally
-// (through the Vite proxy) and on the deployed link without changes.
-function socketUrl() {
-  const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
-  return `${protocol}://${location.host}/ws`
+// Returns the current route: '/', '/host', '/play', or '/preview'
+function getRoute() {
+  const path = location.hash.slice(1).split('?')[0]
+  return path || '/'
 }
 
-function App() {
-  const [status, setStatus] = useState('connecting')
-
+function useRoute() {
+  const [route, setRoute] = useState(getRoute)
   useEffect(() => {
-    const socket = new WebSocket(socketUrl())
-    socket.onopen = () => {
-      setStatus('connected')
-      socket.send(JSON.stringify({ type: 'ping' }))
-    }
-    socket.onclose = () => setStatus('disconnected')
-    socket.onerror = () => setStatus('disconnected')
-    return () => socket.close()
+    const onChange = () => setRoute(getRoute())
+    window.addEventListener('hashchange', onChange)
+    return () => window.removeEventListener('hashchange', onChange)
   }, [])
+  return route
+}
 
+export default function App() {
+  const route = useRoute()
+
+  // Every screen with fake data, for checking the design
+  if (route === '/preview') {
+    return <Preview />
+  }
+
+  if (route === '/host') {
+    return (
+      <HostLobby
+        code="KQZT"
+        players={[
+          { name: 'Sara', connected: true },
+          { name: 'Abdullah', connected: true },
+          { name: 'Noura', connected: false },
+        ]}
+        onStart={() => console.log('start')}
+      />
+    )
+  }
+
+  // '/' and '/play' both show the welcome screen for now
   return (
-    <main>
-      <h1>Quiz Battle</h1>
-      <p>
-        Server: <span className={`status ${status}`}>{status}</span>
-      </p>
-    </main>
+    <Welcome
+      onJoin={({ code, name }) => console.log('join', code, name)}
+      onHost={() => (location.hash = '#/host')}
+    />
   )
 }
-
-export default App

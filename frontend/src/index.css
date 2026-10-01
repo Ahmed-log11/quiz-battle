@@ -1,28 +1,47 @@
-:root {
-  font-family: system-ui, sans-serif;
-  color-scheme: light dark;
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+
+  --color-bg: #1B1740;
+  --color-surface: #252052;
+  --color-track: #2E2966;
+  --color-muted: #A5A0E8;
+
+  --color-option: #F4F3FF;
+  --color-option-text: #1B1740;
+  --color-option-key: #E4E1FF;
+  --color-accent: #6C5CE7;
+
+  --color-gold: #FFD166;
+  --color-correct: #22C55E;
+  --color-wrong: #EF4444;
+
+  /* Name chip pops in purple, then settles (host lobby) */
+  --animate-join: join 1.2s ease-out;
+  /* Quick scale-in for results and cards */
+  --animate-pop: pop 0.4s ease-out both;
+  /* Rows slide up one after another (leaderboards) */
+  --animate-rise: rise 0.5s ease-out both;
+
+  @keyframes join {
+    0%   { transform: scale(0.6); opacity: 0; background-color: var(--color-accent); }
+    30%  { transform: scale(1.08); opacity: 1; background-color: var(--color-accent); }
+    100% { transform: scale(1); background-color: var(--color-surface); }
+  }
+  @keyframes pop {
+    0%   { transform: scale(0.8); opacity: 0; }
+    70%  { transform: scale(1.04); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  @keyframes rise {
+    0%   { transform: translateY(16px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-}
-
-main {
-  text-align: center;
-  padding: 16px;
-}
-
-.status {
-  font-weight: 600;
-}
-
-.status.connected {
-  color: #16a34a;
-}
-
-.status.disconnected {
-  color: #dc2626;
+  @apply bg-bg text-white font-sans min-h-screen;
+  font-variant-numeric: tabular-nums;
 }
