@@ -2,7 +2,7 @@
 # أسئلة أساسيات البايثون
 # كل سؤال عبارة عن dictionary فيه: السؤال، الخيارات، رقم الإجابة الصحيحة
  
-questions = [
+QUESTIONS = [
     {
         "question": "Which function prints text on the screen?",
         "choices": ["print()", "show()", "write()", "display()"],
