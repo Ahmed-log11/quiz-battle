@@ -1,5 +1,6 @@
 import Leaderboard from '../components/Leaderboard.jsx'
 import { OPTION_LETTERS } from '../components/options.js'
+import CodeBlock from '../components/CodeBlock.jsx'
 
 /**
  * Host result screen (projector), shown after each question:
@@ -7,7 +8,8 @@ import { OPTION_LETTERS } from '../components/options.js'
  *
  * Props:
  *   question       { index, total, text, options }
- *   correctOption  index of the right option (0-3)
+ *   correctOption  index of the right option (0-3), or null for typed-answer questions
+ *   correctAnswer  the right answer as text (shown for typed-answer questions)
  *   fastest        { name, seconds } of the fastest correct player, or null
  *   correctCount   how many players got it right
  *   players        total number of players
@@ -18,6 +20,7 @@ import { OPTION_LETTERS } from '../components/options.js'
 export default function HostResult({
   question,
   correctOption,
+  correctAnswer,
   fastest,
   correctCount,
   players,
@@ -32,8 +35,20 @@ export default function HostResult({
           Question {question.index + 1} of {question.total}
         </p>
         <h1 className="mt-2 text-2xl md:text-3xl font-bold">{question.text}</h1>
+        {question.code && (
+          <div className="mt-4">
+            <CodeBlock code={question.code} />
+          </div>
+        )}
 
-        {/* Options with the correct one marked */}
+        {/* Typed-answer question: show the correct output.
+            Multiple choice: show the options with the correct one marked. */}
+        {correctOption === null || correctOption === undefined ? (
+          <div className="animate-pop mt-6 rounded-xl bg-correct p-4">
+            <p className="text-sm font-semibold text-white/80">Correct output</p>
+            <p className="mt-1 whitespace-pre-wrap font-mono text-2xl font-bold text-white">{correctAnswer}</p>
+          </div>
+        ) : (
         <div className="mt-6 grid grid-cols-2 gap-3">
           {question.options.map((option, i) => {
             const isCorrect = i === correctOption
@@ -56,6 +71,7 @@ export default function HostResult({
             )
           })}
         </div>
+        )}
 
         <div className="mt-8 grid gap-6 md:grid-cols-[2fr_3fr]">
           {/* Fastest correct player */}

@@ -42,6 +42,7 @@ export default function HostFlow() {
         <HostResult
           question={state.question}
           correctOption={state.reveal.correctOption}
+          correctAnswer={state.reveal.correctAnswer}
           fastest={state.reveal.fastest}
           correctCount={state.reveal.correctCount}
           players={playerCount}

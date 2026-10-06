@@ -35,9 +35,9 @@ from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 
-from game_logic import (POINT, TIME_LIMIT, add_player, advance, all_answered, awards,
-                        current_question, leaderboard, new_game, rank, start_game,
-                        submit_answer)
+from game_logic import (POINT, add_player, advance, all_answered, awards,
+                        correct_answer_text, current_question, is_text, leaderboard,
+                        new_game, rank, start_game, submit_answer, time_limit)
 from questions import QUESTIONS
 
 app = FastAPI(title="Quiz Battle")
@@ -61,8 +61,9 @@ def start_timer():
     """Start the countdown for the current question."""
     global deadline, timer_task
     stop_timer()
-    deadline = time.time() + TIME_LIMIT
-    timer_task = asyncio.create_task(time_up(game["q_index"]))
+    limit = time_limit(current_question(game))     # typed answers can have longer
+    deadline = time.time() + limit
+    timer_task = asyncio.create_task(time_up(game["q_index"], limit))
 
 
 def stop_timer():
@@ -70,9 +71,9 @@ def stop_timer():
         timer_task.cancel()
 
 
-async def time_up(index):
+async def time_up(index, limit):
     """When time runs out, reveal the answer (if we are still on that question)."""
-    await asyncio.sleep(TIME_LIMIT)
+    await asyncio.sleep(limit)
     if game["phase"] == "question" and game["q_index"] == index:
         advance(game)
         await broadcast()
@@ -95,7 +96,7 @@ def player_view(name):
             "rank": rank(game, name),
             "totalPlayers": len(game["players"]),
             "streak": game["stats"][name]["streak"],
-            "correctAnswer": q["options"][q["answer"]],
+            "correctAnswer": correct_answer_text(q),
             "fastestName": game["winner"],
         }
     elif phase == "finished":
@@ -130,8 +131,10 @@ def build_state(name=None):
             "index": game["q_index"],
             "total": len(QUESTIONS),
             "text": q["q"],
-            "options": q["options"],
-            "timeLimit": TIME_LIMIT,
+            "code": q.get("code"),       # snippet for output questions, or None
+            "type": "text" if is_text(q) else "choice",
+            "options": q.get("options", []),   # empty for typed-answer questions
+            "timeLimit": time_limit(q),
             # time left instead of a clock time, because phone clocks are not exact
             "timeLeftMs": max(0, int((deadline - time.time()) * 1000)) if phase == "question" else 0,
         }
@@ -140,8 +143,8 @@ def build_state(name=None):
     if phase == "reveal" and q is not None:
         winner = game["winner"]
         state["reveal"] = {
-            "correctOption": q["answer"],
-            "correctAnswer": q["options"][q["answer"]],
+            "correctOption": None if is_text(q) else q["answer"],
+            "correctAnswer": correct_answer_text(q),
             "fastest": {"name": winner, "seconds": round(game["winner_seconds"], 1)} if winner else None,
             "correctCount": sum(1 for a in game["answers"].values() if a["correct"]),
         }
@@ -242,7 +245,7 @@ async def game_socket(ws: WebSocket):
 
             elif role == "player":
                 if kind == "answer" and game["phase"] == "question":
-                    seconds = TIME_LIMIT - (deadline - time.time())
+                    seconds = time_limit(current_question(game)) - (deadline - time.time())
                     submit_answer(game, name, msg.get("choice"), seconds)
                     reveal_if_everyone_answered()
 
