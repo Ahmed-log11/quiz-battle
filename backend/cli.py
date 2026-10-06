@@ -18,6 +18,10 @@ def ask_player(name, q):
     """Show the options, time the player, return (choice_index, seconds)."""
     input(f"\n{name}, press Enter when you are ready ({TIME_LIMIT} seconds to answer)...")
     print(q["q"])
+    if "code" in q:                           # output question: show the code
+        print("-" * 30)
+        print(q["code"])
+        print("-" * 30)
     for i, option in enumerate(q["options"], start=1):
         print(f"  {i}. {option}")
 

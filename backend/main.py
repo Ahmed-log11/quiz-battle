@@ -130,6 +130,7 @@ def build_state(name=None):
             "index": game["q_index"],
             "total": len(QUESTIONS),
             "text": q["q"],
+            "code": q.get("code"),       # snippet for output questions, or None
             "options": q["options"],
             "timeLimit": TIME_LIMIT,
             # time left instead of a clock time, because phone clocks are not exact

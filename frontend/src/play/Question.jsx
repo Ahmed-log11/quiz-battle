@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Timer from '../components/Timer.jsx'
 import { OPTION_LETTERS } from '../components/options.js'
+import CodeBlock from '../components/CodeBlock.jsx'
 
 /**
  * Player question screen: four answer buttons and the countdown.
@@ -31,6 +32,11 @@ export default function Question({ question, onAnswer, initialChoice = null }) {
           Question {question.index + 1} of {question.total}
         </p>
         <h1 className="mt-2 text-xl md:text-3xl font-bold">{question.text}</h1>
+        {question.code && (
+          <div className="mt-4">
+            <CodeBlock code={question.code} />
+          </div>
+        )}
 
         <div className="mt-4">
           <Timer deadline={question.deadline} timeLimit={question.timeLimit} />
