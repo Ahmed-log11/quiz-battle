@@ -1,5 +1,6 @@
 import Timer from '../components/Timer.jsx'
 import { OPTION_LETTERS } from '../components/options.js'
+import CodeBlock from '../components/CodeBlock.jsx'
 
 /**
  * Host question screen (projector): big question, options, timer,
@@ -29,12 +30,25 @@ export default function HostQuestion({ question, answered, players, onReveal }) 
           </span>
         </div>
 
-        <h1 className="mt-8 text-4xl md:text-6xl font-bold leading-tight">{question.text}</h1>
+        <h1 className={`mt-8 font-bold leading-tight ${question.code ? 'text-3xl md:text-4xl' : 'text-4xl md:text-6xl'}`}>
+          {question.text}
+        </h1>
+        {question.code && (
+          <div className="mt-6">
+            <CodeBlock code={question.code} size="lg" />
+          </div>
+        )}
 
         <div className="mt-8">
           <Timer deadline={question.deadline} timeLimit={question.timeLimit} size="lg" />
         </div>
 
+        {question.type === 'text' ? (
+          <div className="mt-10 rounded-2xl border-2 border-dashed border-track p-8 text-center">
+            <p className="text-3xl font-bold">Type the output on your phone</p>
+            <p className="mt-2 text-lg text-muted">Exactly as Python prints it</p>
+          </div>
+        ) : (
         <div className="mt-10 grid grid-cols-2 gap-4">
           {question.options.map((option, i) => (
             <div
@@ -49,6 +63,7 @@ export default function HostQuestion({ question, answered, players, onReveal }) 
             </div>
           ))}
         </div>
+        )}
 
         <div className="mt-auto flex justify-end pt-8">
           <button
