@@ -1,5 +1,6 @@
 import Timer from '../components/Timer.jsx'
 import { OPTION_LETTERS } from '../components/options.js'
+import CodeBlock from '../components/CodeBlock.jsx'
 
 /**
  * Host question screen (projector): big question, options, timer,
@@ -29,7 +30,14 @@ export default function HostQuestion({ question, answered, players, onReveal }) 
           </span>
         </div>
 
-        <h1 className="mt-8 text-4xl md:text-6xl font-bold leading-tight">{question.text}</h1>
+        <h1 className={`mt-8 font-bold leading-tight ${question.code ? 'text-3xl md:text-4xl' : 'text-4xl md:text-6xl'}`}>
+          {question.text}
+        </h1>
+        {question.code && (
+          <div className="mt-6">
+            <CodeBlock code={question.code} size="lg" />
+          </div>
+        )}
 
         <div className="mt-8">
           <Timer deadline={question.deadline} timeLimit={question.timeLimit} size="lg" />

@@ -1,5 +1,6 @@
 import Leaderboard from '../components/Leaderboard.jsx'
 import { OPTION_LETTERS } from '../components/options.js'
+import CodeBlock from '../components/CodeBlock.jsx'
 
 /**
  * Host result screen (projector), shown after each question:
@@ -32,6 +33,11 @@ export default function HostResult({
           Question {question.index + 1} of {question.total}
         </p>
         <h1 className="mt-2 text-2xl md:text-3xl font-bold">{question.text}</h1>
+        {question.code && (
+          <div className="mt-4">
+            <CodeBlock code={question.code} />
+          </div>
+        )}
 
         {/* Options with the correct one marked */}
         <div className="mt-6 grid grid-cols-2 gap-3">
