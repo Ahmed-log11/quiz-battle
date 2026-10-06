@@ -49,7 +49,28 @@ def current_question(game):
     if game["q_index"] < len(QUESTIONS):
         return QUESTIONS[game["q_index"]]
     return None
+def is_text(q):
+    """True for typed-answer questions, False for multiple choice."""
+    return q.get("type") == "text"
 
+
+def time_limit(q):
+    """Seconds allowed for this question (typed answers can have longer)."""
+    return q.get("time_limit", TIME_LIMIT)
+
+
+def correct_answer_text(q):
+    """The correct answer as text, for showing on the screens."""
+    if is_text(q):
+        return q["answer"]
+    return q["options"][q["answer"]]
+
+
+def normalize(text):
+    """Make typed answers easier to match: trim the ends and
+    treat several spaces as one. Capital letters still matter,
+    because Python output is case-sensitive (True is not true)."""
+    return " ".join(str(text).split())
 
 def add_player(game, name):
     """Add a player. Returns (ok, message)."""
@@ -80,15 +101,21 @@ def submit_answer(game, name, choice, seconds):
         return False
     if name not in game["players"] or name in game["answers"]:
         return False
-    if seconds > TIME_LIMIT:
-        return False                  # too late
-    # choice must be a real option index (bool is excluded on purpose)
-    if not isinstance(choice, int) or isinstance(choice, bool):
-        return False
-    if choice < 0 or choice >= len(q["options"]):
-        return False
-
-    correct = (choice == q["answer"])
+    if seconds > time_limit(q):
+        return False 
+    if is_text(q):
+        # typed answer: must be some text, not too long
+        if not isinstance(choice, str) or choice.strip() == "" or len(choice) > 100:
+            return False
+        choice = choice.strip()
+        correct = (normalize(choice) == normalize(q["answer"]))
+    else:
+        # choice must be a real option index (bool is excluded on purpose)
+        if not isinstance(choice, int) or isinstance(choice, bool):
+            return False
+        if choice < 0 or choice >= len(q["options"]):
+            return False
+        correct = (choice == q["answer"])
     game["answers"][name] = {"choice": choice, "correct": correct, "seconds": seconds}
     return True
 

@@ -9,24 +9,35 @@ Run:  python cli.py
 
 import time
 
-from game_logic import (POINT, TIME_LIMIT, add_player, advance, current_question,
-                        leaderboard, new_game, start_game, submit_answer)
+from game_logic import (POINT, add_player, advance, correct_answer_text, current_question,
+                        is_text, leaderboard, new_game, start_game, submit_answer,
+                        time_limit)
 from questions import QUESTIONS
 
 
 def ask_player(name, q):
-    """Show the options, time the player, return (choice_index, seconds)."""
-    input(f"\n{name}, press Enter when you are ready ({TIME_LIMIT} seconds to answer)...")
+    """Show the question, time the player, return (choice, seconds).
+    choice is an option index, or the typed text for typed-answer questions."""
+    limit = time_limit(q)
+    input(f"\n{name}, press Enter when you are ready ({limit} seconds to answer)...")
     print(q["q"])
-    for i, option in enumerate(q["options"], start=1):
-        print(f"  {i}. {option}")
+    if "code" in q:                           # output question: show the code
+        print("-" * 30)
+        print(q["code"])
+        print("-" * 30)
+    if not is_text(q):
+        for i, option in enumerate(q["options"], start=1):
+            print(f"  {i}. {option}")
 
     start = time.time()                       # timer starts when the question appears
-    raw = input("Your answer (number): ")
+    if is_text(q):
+        choice = input("Type the output: ")   # typed answer: keep the text
+    else:
+        raw = input("Your answer (number): ")
+        choice = int(raw) - 1 if raw.isdigit() else -1   # -1 = invalid answer
     elapsed = time.time() - start
 
-    choice = int(raw) - 1 if raw.isdigit() else -1   # -1 = invalid answer
-    if elapsed > TIME_LIMIT:
+    if elapsed > limit:
         input(f"Too slow ({elapsed:.1f}s), your answer doesn't count. Press Enter...")
     print("\n" * 40)                          # hide the screen from the next player
     return choice, elapsed
@@ -51,7 +62,7 @@ def main():
             submit_answer(game, name, choice, elapsed)
 
         advance(game)                     # question -> reveal: fastest correct gets the point
-        print(f"Correct answer: {q['options'][q['answer']]}")
+        print(f"Correct answer: {correct_answer_text(q)}")
         if game["winner"]:
             print(f"Point goes to: {game['winner']} ({game['winner_seconds']:.1f}s, +{POINT})")
         else:
