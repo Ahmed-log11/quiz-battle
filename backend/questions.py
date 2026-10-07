@@ -24,11 +24,6 @@ Any question can have "time_limit"; without it the game uses TIME_LIMIT.
 QUESTIONS = [
     # ---------- 1. Regular multiple choice ----------
     {
-        "q": "v has 3 elements. What is the shape of v.reshape(-1, 1)?",
-        "options": ["(3,)", "(1, 3)", "(3, 1)", "(3, 3)"],
-        "answer": 2,
-    },
-    {
         "q": "The dot product of two vectors is close to 0. What does that mean?",
         "options": [
             "They point in the same direction",
@@ -36,11 +31,6 @@ QUESTIONS = [
             "They point in opposite directions",
             "One of them is all zeros",
         ],
-        "answer": 1,
-    },
-    {
-        "q": "Cosine similarity compares two vectors by their...",
-        "options": ["Length", "Direction", "Number of elements", "Largest value"],
         "answer": 1,
     },
     {
@@ -76,20 +66,6 @@ QUESTIONS = [
     },
     {
         "q": "What does this code print?",
-        "code": "import numpy as np\n\nA = np.array([[2, 0],\n              [0, 3]])\nv = np.array([1, 1])\nprint(A @ v)",
-        "options": ["[2 3]", "[3 2]", "[2 0]", "5"],
-        "answer": 0,
-        "time_limit": 25,
-    },
-    {
-        "q": "What does this code print?",
-        "code": "a = [1, 2, 3]\nb = a\nb.append(4)\nprint(len(a))",
-        "options": ["3", "4", "None", "Error"],
-        "answer": 1,
-        "time_limit": 25,
-    },
-    {
-        "q": "What does this code print?",
         "code": "word = 'Python'\nprint(word[1:4])",
         "options": ["Pyt", "yth", "ytho", "yt"],
         "answer": 1,
@@ -107,20 +83,6 @@ QUESTIONS = [
     {
         "type": "text",
         "q": "Type what this code prints",
-        "code": "import numpy as np\n\nv = np.array([3, 4])\nprint(int(np.linalg.norm(v)))",
-        "answer": "5",
-        "time_limit": 40,
-    },
-    {
-        "type": "text",
-        "q": "Type what this code prints",
-        "code": "def check(n):\n    for i in range(n):\n        if i == 2:\n            return i * 10\n    return -1\n\nprint(check(5))",
-        "answer": "20",
-        "time_limit": 40,
-    },
-    {
-        "type": "text",
-        "q": "Type what this code prints",
         "code": "scores = {'Sara': 7, 'Omar': 9, 'Lama': 4}\nbest = max(scores, key=lambda k: scores[k])\nprint(best)",
         "answer": "Omar",
         "time_limit": 40,
@@ -131,5 +93,18 @@ QUESTIONS = [
         "code": "total = 0\nfor n in range(1, 6):\n    if n % 2 == 0:\n        total += n\n    elif n == 5:\n        total += 10\nprint(total)",
         "answer": "16",
         "time_limit": 40,
+    },
+
+    # ---------- Bonus: just for fun ----------
+    {
+        "q": "What is the best project?",
+        "options": [
+            "Quiz Battle",
+            "Who cares",
+            "The other game",
+            "Still loading...",
+        ],
+        "answer": 0,
+        "time_limit": 15,
     },
 ]
